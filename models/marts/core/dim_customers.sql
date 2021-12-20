@@ -1,14 +1,16 @@
-{{ config(
-    materialized="table"
-)}}
-
 with customers as (
     select * from {{ ref ('stg_customers') }}
 ),
 orders as (
   select * from {{ ref ('stg_orders') }}
 ),
-
+payments as (
+  select
+    customer_id,
+    sum(amount) as lifetime_amount
+ from {{ ref ('fct_orders') }}
+ group by 1
+),
 customer_orders as (
   select
     customer_id,
@@ -26,9 +28,11 @@ final as (
     customers.last_name,
     customer_orders.first_order_date,
     customer_orders.most_recent_order_date,
-    coalesce(customer_orders.number_of_orders, 0) as number_of_orders
+    coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
+    payments.lifetime_amount
   from customers
   left join customer_orders using (customer_id)
+  left join payments using (customer_id)
   order by 1
 )
 
