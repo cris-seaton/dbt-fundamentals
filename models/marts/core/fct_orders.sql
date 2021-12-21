@@ -9,8 +9,9 @@ payments as (
 order_payments as (
     select 
         order_id,
-        sum(case when status='success' then amount end) as amount
+        sum(amount) as amount
     from payments
+    where status='success'
     group by 1
 ),
 
