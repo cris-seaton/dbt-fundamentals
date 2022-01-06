@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_payments
+    desription: One unique payment/transaction per row
+    columns:
+        - name: payment_id
+          description: Primary key for stg_payments
+          tests:
+            - unique
+            - not_null   
+        - name: order_id
+          description: Foreign key for stg_orders
+        - name: payment_method
+          description: "{{ doc('payment_method') }}"
